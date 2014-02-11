@@ -1,0 +1,3 @@
+1. Means that the maximum of the data range is equal to the number of rows in the column minus 0 (because count starts from 0, so first row is 0).
+2. color(0) should call the rgb value for orangered; color(10) call the interpolated rgb value for a color 10/50 (since this list includes DC) of the way between orangered and silver . Color(150) should call an exception, since it exceeds the domain maximum.
+3. Would change the scale to be between 2.6 and 9.0, where the former is the minimum and represents the rgb value for orangered and the latter is silver. Would be appropriate if you want to color the table rows by Rate.
