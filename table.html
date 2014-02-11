@@ -63,7 +63,7 @@
       var color = d3.scale.linear()
       .domain([0, tbody.selectAll("tr")[0].length-1])
       .interpolate(d3.interpolateRgb)
-      .range(["orangered", "silver"])
+      .range(["orangered", "silver"]);
 
       var heading = thead.selectAll("tr")
       .data(headers)
@@ -134,9 +134,7 @@
       }
 
       var rowresort = tbody.selectAll("tr").sort(resort)
-      .style("background-color", zebra) 
-      
-    });
+      .style("background-color", function (d) { return color(d); });
      
      var rows = tbody.selectAll("tr")
      .data(states)
@@ -154,7 +152,7 @@
         return +d3.ascending(a[2], b[2])
       }
     })
-     .style("background-color", zebra)
+      .style("background-color", function (d) { return color(d); });
 
      var cells = rows.selectAll("td")
      .data(function(row) {
