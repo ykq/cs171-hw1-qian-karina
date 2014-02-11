@@ -1,0 +1,175 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>CS171 Homework 1</title>
+
+    <style type="text/css">
+
+    tr, td, th {
+      padding: 2px;
+      border: 1px black solid;
+      font-family: Tahoma, sans-serif;
+      font-size: small;
+      text-align: center;
+    }
+
+    table {
+      padding: 2px;
+      border: 1px black solid;
+      font-family: Tahoma, sans-serif;
+      margin-left: auto;
+      margin-right: auto;
+      border-collapse: collapse;
+    }
+
+    caption {
+      padding: 2px;
+      border-top: 1px black solid;
+      border-bottom: 0px;
+      border-left: 1px black solid;
+      border-right: 1px black solid;
+      font-family: Tahoma, sans-serif;
+      font-weight: bold;
+      font-size: 14;
+    }
+
+    </style>
+  </head>
+  <body>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script>
+
+    var body = d3.select("body");
+
+    var h1 = body.append("h1");
+    h1.text("Unemployment Rates for States")
+    .style("font-size", "12")
+    .style("text-align", "center")
+
+    d3.text("unemp_states_us_nov_2013.tsv", function(_data){
+
+      var data = d3.tsv.parseRows(_data);
+
+      var headers = data.slice(0,1);
+      var states = data.slice(1);
+
+      var table = d3.select("body").append("table")
+      var thead = table.append("thead")
+      var tbody = table.append("tbody")
+      var caption = table.append("caption")
+      caption.html("Monthly Rankings" + "</br>" + "Seasonally Adjusted" + "</br>" + "Nov. 2013" + "</br>");
+
+      var color = d3.scale.linear()
+      .domain([0, tbody.selectAll("tr")[0].length-1])
+      .interpolate(d3.interpolateRgb)
+      .range(["orangered", "silver"])
+
+      var heading = thead.selectAll("tr")
+      .data(headers)
+      .enter()
+      .append("tr");
+
+      var zebra = function(d, i) {
+       if (i%2===0){return "lightblue";}else{return "white";}
+     };
+
+     var headerrow = heading.selectAll("th")
+     .data(function(row) {
+      return d3.range(Object.keys(row).length).map(function(column, i) {
+        return row[Object.keys(row)[i]];
+      });
+    })
+     .enter()
+     .append("th")
+     .text(function(d) { return d; })
+     .on("mouseover", function (d, i) {d3.select(this).style("cursor", function() {
+      if (+d3.ascending(a[i], b[i]) === -1) {
+        return "s-resize";
+      }
+      else if (+d3.ascending(a[i], b[i]) === 1) {
+        return "n-resize";
+      }
+      else {
+        if(d3.ascending(a[1], b[1]) === -1) {
+          return "s-resize";            
+        }
+        else {
+          return "n-resize";            
+        }
+      }
+    } 
+          )})  // NOTE THAT I NEED TO FIX CURSOR AND ZEBRA ERROR THAT HAPPENS WHEN YOU HAVE TWO ODD RANKED STATES RIGHT NEXT TO EACH OTHER AFTER SORTING
+     .on("click", function (d, i) { 
+      var sort;
+
+      if (i > 0) { 
+        sort = function (a, b) {
+          if (a[i] === b[i]) {
+            return d3.ascending(a[1], b[1])
+          }
+          else {
+            return +d3.ascending(a[i], b[i])
+          }
+        }
+      }
+
+      var rowsort = tbody.selectAll("tr").sort(sort)
+      .style("background-color", zebra)
+
+    })
+
+     .on("dblclick", function (d, i) {
+      var resort;
+
+      if (i > 0) { 
+        resort = function (a, b) {
+          if (a[i] === b[i]) {
+            return d3.descending(a[1], b[1])
+          }
+          else {
+            return +d3.descending(a[i], b[i])
+          }
+        }
+      }
+
+      var rowresort = tbody.selectAll("tr").sort(resort)
+      .style("background-color", zebra) 
+      
+    });
+     
+     var rows = tbody.selectAll("tr")
+     .data(states)
+     .enter()
+     .append("tr")
+     .on("mouseover", function (){d3.select(this).style("background-color", "lightgreen");})
+     .on("mouseout", function (d, i){d3.select(this).style("background-color", function(){
+      if (i%2===0){return "lightblue";}else{return "white";}
+    })})
+     .sort(function (a, b) { 
+      if (a[2] === b[2]) {
+        return d3.ascending(a[1], b[1])
+      }
+      else {
+        return +d3.ascending(a[2], b[2])
+      }
+    })
+     .style("background-color", zebra)
+
+     var cells = rows.selectAll("td")
+     .data(function(row) {
+      return d3.range(Object.keys(row).length).map(function(column, i) {
+        return row[Object.keys(row)[i]];
+      });
+    })
+     .enter()
+     .append("td")
+     .attr("class", function (d, i) { return "column_" + i; })
+     .on("mouseover", function (d, i) {d3.selectAll("td.column_" + i).style("background-color", "lightgreen");})
+     .on("mouseout", function (d, i) {d3.selectAll("td.column_" + i).style("background-color", null)})
+     .text(function(d) { return d; });
+
+   });
+  </script>
+</body>
+</html>
