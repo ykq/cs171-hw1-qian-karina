@@ -15,9 +15,10 @@
 
 <body>
 
-  <label><input type="radio" name="order" value="state"> State</label>
-
-  <label><input type="radio" name="order" value="rate" checked> Rate</label>
+  <form>
+    <label><input type="radio" name="order" value="states"> State</label>
+    <label><input type="radio" name="order" value="rate" checked> Rate</label>
+  </form>
 
   <script type="text/javascript">
 
@@ -81,11 +82,12 @@
 
       var bars = groups
         .append("rect")
-        .attr("width", function(d) { return xScale(d.Rate); })
+        .attr("width", function (d) { return xScale(d.Rate); })
         .attr("height", bar_height)
         .style("fill", function (d) { return color(d.Rate); } ); 
 
       var CheckRateAsc = true;  
+      var CheckStateAsc = true;     
 
       var RateSortA = function(a,b) {
         if (a.Rate === b.Rate) {
@@ -106,18 +108,26 @@
         }
       };
 
-      var reorder = function () {
+      var StateSortA = function(a, b) { 
+        return d3.ascending(a.State, b.State)
+      };
+
+      var StateSortD = function(a,b) {
+          return d3.descending(a.State, b.State)
+      };
+
+      var reorderRate = function () {
         var sort;
 
-        if (CheckRateAsc === true) {
-          sort = RateSortD;
-          CheckRateAsc = false;
-        }
-        else {
-          sort = RateSortA;
-          CheckRateAsc = true;
-        }
-
+          if (CheckRateAsc === true) {
+            sort = RateSortD;
+            CheckRateAsc = false;
+          }
+          else {
+            sort = RateSortA;
+            CheckRateAsc = true;
+          }
+       
         var sorteddata = data.sort(sort)
 
         yScale.domain(sorteddata.map(state))
@@ -128,7 +138,39 @@
         .attr("transform", function (d, i) { return "translate(0," + yScale(d.State) + ")"; })
       };
 
-      d3.selectAll("input").on("change", reorder);
+        var reorderState = function () {
+        var sort;
+
+          if (CheckStateAsc === true) {
+            sort = StateSortD;
+            CheckStateAsc = false;
+          }
+          else { 
+            sort = StateSortA;
+            CheckStateAsc = true;
+          }
+        
+        var sorteddata2 = data.sort(sort)
+
+        yScale.domain(sorteddata2.map(state))
+
+        groups.transition()
+        .duration(750)
+        .delay(function (d, i) { return i * 10; })
+        .attr("transform", function (d, i) { return "translate(0," + yScale(d.State) + ")"; })
+      };
+
+      d3.selectAll("input").on("click", function() { 
+        var value = this.value;
+        console.log(value);
+        if (value === "states") { 
+          reorderState(); 
+        } 
+        else { 
+          reorderRate(); 
+        } 
+      });
+
     });
   </script>
 </body>
