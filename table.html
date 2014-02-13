@@ -64,7 +64,7 @@
       var color = d3.scale.linear()
       .domain(d3.extent(data, function (d) { return +d[2]; }))
       .interpolate(d3.interpolateRgb)
-      .range(["orangered", "silver"]);
+      .range(["lightblue", "orangered"]);
 
       var StateSortA = function(a, b) { 
           return d3.ascending(a[1], b[1]) 
