@@ -58,7 +58,7 @@
         .data(data)
       .enter()
         .append("g")
-        .attr("transform", function(d, i) { return "translate(0, " + yScale(d.State) +")"; });
+        .attr("transform", function (d, i) { return "translate(0, " + yScale(d.State) +")"; });
 
       g.append("text")
         .text("Unemployment Rates for States")
@@ -101,8 +101,7 @@
         if (a.Rate === b.Rate) {
           return d3.descending(a.State, b.State)
         }
-        else {
-          console.log(a.Rate);          
+        else {         
           return +d3.descending(a.Rate, b.Rate)
         }
       };
@@ -126,11 +125,10 @@
         groups.transition()
         .duration(750)
         .delay(function (d, i) { return i * 10; })
-        .attr("transform", function (d, i) { return "translate(" + d.State + ", " + d.Rate + ")"; })
+        .attr("transform", function (d, i) { return "translate(0," + yScale(d.State) + ")"; })
       };
 
       d3.selectAll("input").on("change", reorder);
-
     });
   </script>
 </body>
