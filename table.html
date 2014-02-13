@@ -12,6 +12,7 @@
       font-family: Tahoma, sans-serif;
       font-size: small;
       text-align: center;
+      border-collapse: collapse;
     }
 
     table {
@@ -48,10 +49,6 @@
     .style("text-align", "center")
 
     d3.text("unemp_states_us_nov_2013.tsv", function(_data){
-
-      var margin = {top: 50, bottom: 10, left:300, right: 40};
-      var width = 900 - margin.left - margin.right;
-      var height = 900 - margin.top - margin.bottom;
 
       var data = d3.tsv.parseRows(_data);
 
@@ -95,8 +92,28 @@
         }
       };
 
+      var GraphSortA = function(a,b) {
+        if (a[0] === b[0]) {
+        return d3.ascending(a[1], b[1])
+          }
+          else {
+            return d3.ascending(parseFloat(a[0]), parseFloat(b[0]))
+          }
+        };
+
+
+      var GraphSortD = function(a,b) {
+        if (a[0] === b[0]) {
+        return d3.descending(a[1], b[1])
+          }
+          else {
+            return d3.descending(parseFloat(a[0]), parseFloat(b[0]))
+          }
+        };
+
       var CheckStateAsc = true;
       var CheckRateAsc = true;
+      var CheckBarAsc = true;
 
       var heading = thead.selectAll("tr")
       .data(headers)
@@ -112,7 +129,7 @@
         return color(d);
       }};
 
-     var headerrow = heading.selectAll("th")
+     heading.selectAll("th")
      .data(function(row) {
       return d3.range(Object.keys(row).length).map(function(column, i) {
         return row[Object.keys(row)[i]];
@@ -120,7 +137,13 @@
     })
      .enter()
      .append("th")
-     .text(function(d) { return d; })
+     .text(function(d) { return d; });
+
+      heading.insert("th")
+      .html("</br>" + "Graph")
+      .append("svg");
+
+      var headerrow = heading.selectAll("th")
      .on("click", function (d, i) { 
       var sort;
 
@@ -144,8 +167,19 @@
           CheckRateAsc = true;
         }
       }
+      if (i === 3) {
+        if (CheckBarAsc === true) {     
+          sort = GraphSortD;
+          CheckBarAsc = false;
+        }
+        else {
+          sort = GraphSortA;
+          CheckBarAsc = true;
+        }
+      }
 
-        var rowsort = tbody.selectAll("tr").sort(sort)  // FIX RANK AFTER SORT       
+
+        var rowsort = tbody.selectAll("tr").sort(sort) 
         .style("background-color", zebra)
       })
       .on("mouseover", function (d, i) {d3.select(this).style("cursor", function() {
@@ -166,7 +200,7 @@
           }
       }
     })});
-     
+
      var rows = tbody.selectAll("tr")
      .data(states)
      .enter()
@@ -178,27 +212,26 @@
      .sort(RateSortA)
      .style("background-color", zebra);
 
-     var cells = rows.selectAll("td")
-     .data(function(row) {
-      return d3.range(Object.keys(row).length).map(function(column, i) {
-        return row[Object.keys(row)[i]];
-      });})
-     .enter()
-     .append("td")
-     .attr("class", function (d, i) { return "column_" + i; })
-     .on("mouseover", function (d, i) {d3.selectAll("td.column_" + i).style("background-color", "yellow");})
-     .on("mouseout", function (d, i) {d3.selectAll("td.column_" + i).style("background-color", null )}) // FIX MOUSEOUT
-     .text(function(d) { return d; });
-
-     var xScale = d3.scale.linear().range([0, width]);
-     var yScale = d3.scale.ordinal().rangeRoundBands([0, height], .8, 0);
+     rows.selectAll("td")
+       .data(function(row) {
+        return d3.range(Object.keys(row).length).map(function(column, i) {
+          return row[Object.keys(row)[i]];
+        });})
+       .enter()
+       .append("td")
+       .text(function(d) { return d; });
 
      rows.insert("td").append("svg")
-     .attr("width", xScale)
-     .attr("height", yScale)
-     .append("rect")
-     .attr("height", yScale)
-     .attr("width", function(d) { return parseFloat(d[0]); });
+       .attr("width", 60)
+       .attr("height", 15)
+       .append("rect")
+       .attr("height", 15)
+       .attr("width", function(d) { return parseFloat(d[0]); });
+
+    var cells = rows.selectAll("td")
+     .attr("class", function (d, i) { return "column_" + i; })
+     .on("mouseover", function (d, i) {d3.selectAll("td.column_" + i).style("background-color", "yellow");})
+     .on("mouseout", function (d, i) {d3.selectAll("td.column_" + i).style("background-color", null )}); // FIX MOUSEOUT
 
      var td = d3.selectAll("tbody tr").selectAll("td")
      .style("background-color", gradient);
