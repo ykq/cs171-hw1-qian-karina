@@ -1,0 +1,3 @@
+1. Missing are labels, scales and titles so we understand what data we are looking at and at what scale and how they relate to each other. So chart is not usable in current form. 
+2. Three nested levels of g elements are necessary to organize the data (groups), visually display it (bars), label it (text and title).
+3. Yes, the text elements may not be tied specifically to the rect elements and may look out of place and not serve the purpose of labeling the scale and purpose of the data.
