@@ -6,6 +6,7 @@
 
     <style type="text/css">
 
+    /*set CSS styles to make it look like the BOL table, for rows and each cell therein*/
     tr, td, th {
       padding: 2px;
       border: 1px black solid;
@@ -14,6 +15,7 @@
       text-align: center;
     }
 
+    /*set CSS for the entire table*/
     table {
       padding: 2px;
       border: 1px black solid;
@@ -23,6 +25,7 @@
       border-collapse: collapse;
     }
 
+    /* and for the caption at the top of the table proper*/
     caption {
       padding: 2px;
       border-top: 1px black solid;
@@ -37,15 +40,19 @@
     </style>
   </head>
   <body>
+
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script>
 
+    /* access the body of the HTML page*/
     var body = d3.select("body");
 
+    /* create a h1 div + set CSS styles for the title*/
     var h1 = body.append("h1");
     h1.text("Unemployment Rates for States")
     .style("font-size", "12")
     .style("text-align", "center")
+
 
     d3.text("unemp_states_us_nov_2013.tsv", function(_data){
 
