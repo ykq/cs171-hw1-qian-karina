@@ -12,7 +12,14 @@
     }
   </style>
 </head>
+
 <body>
+
+  <form>
+    <label><input type="radio" name="order" value="states"> State</label>
+    <label><input type="radio" name="order" value="rate" checked> Rate</label>
+  </form>
+
   <script type="text/javascript">
 
     var margin = {top: 50, bottom: 10, left:300, right: 40};
@@ -35,8 +42,15 @@
 
     d3.tsv("unemp_states_us_nov_2013.tsv", function(data) {
 
-      var max = d3.max(data, function(d) { return d.Rate; } );
+      var max = d3.max(data, function(d) { return +d.Rate; } );
       var min = 0;
+      var mincolor = d3.min(data, function(d) { return +d.Rate; } );
+
+      // set the parameters for the color gradiation 
+      var color = d3.scale.linear()
+      .domain([mincolor, max])
+      .interpolate(d3.interpolateRgb)
+      .range(["lightblue", "orangered"]);
 
       xScale.domain([min, max]);
       yScale.domain(data.map(state));
@@ -46,14 +60,130 @@
         .data(data)
       .enter()
         .append("g")
-        .attr("transform", function(d, i) { return "translate(0, " + yScale(d.State) +")"; });
+        .attr("transform", function (d, i) { return "translate(0, " + yScale(d.State) +")"; });
+
+      // add the title to the bar graph 
+      g.append("text")
+        .text("Unemployment Rates for States")
+        .style("font-size", 17)
+        .style("font-weight", "bold");
+
+      // add labels for the rank of each bar
+      groups.append("text")
+        .attr("x", function(d) { return xScale(d.Rate); })
+        .attr("y", function(d) { return bar_height/2; })
+        .attr("text-anchor", "end")
+        .attr("dy", "0.35em")
+        .text(function(d) { return d.Rank; });
+
+      // plus the state represented by each bar
+      groups.append("text")
+        .attr("text-anchor", "end")
+        .attr("dy", "0.35em")
+        .attr("x", function(d) { return xScale(min) - 3; })
+        .attr("y", function(d) { return bar_height/2; })
+        .text(function(d) { return d.State; });
 
       var bars = groups
         .append("rect")
-        .attr("width", function(d) { return xScale(d.Rate); })
-        .attr("height", bar_height);
+        .attr("width", function (d) { return xScale(d.Rate); })
+        .attr("height", bar_height)
+        .style("fill", function (d) { return color(d.Rate); } ); 
+
+      // instantiate the toggles for checking whether to do to an ascending or descending sort
+      var CheckRateAsc = true;  
+      var CheckStateAsc = true;     
+
+      // instantiate the sorts for rate and state, both ascending and descending
+      var RateSortA = function(a,b) {
+        if (a.Rate === b.Rate) {
+        return d3.ascending(a.State, b.State)
+        }
+        else {
+          console.log(a.Rate);
+          return +d3.ascending(a.Rate, b.Rate)
+        }
+      };
+
+      var RateSortD = function(a,b) {   
+        if (a.Rate === b.Rate) {
+          return d3.descending(a.State, b.State)
+        }
+        else {         
+          return +d3.descending(a.Rate, b.Rate)
+        }
+      };
+
+      var StateSortA = function(a, b) { 
+        return d3.ascending(a.State, b.State)
+      };
+
+      var StateSortD = function(a,b) {
+          return d3.descending(a.State, b.State)
+      };
+
+      // instantiate the reorder function by Rate
+      var reorderRate = function () {
+        var sort;
+
+          if (CheckRateAsc === true) {
+            sort = RateSortD;
+            CheckRateAsc = false;
+          }
+          else {
+            sort = RateSortA;
+            CheckRateAsc = true;
+          }
+       
+        var sorteddata = data.sort(sort)
+
+        yScale.domain(sorteddata.map(state))
+
+        groups.transition()
+        .duration(750)
+        .delay(function (d, i) { return i * 10; })
+        .attr("transform", function (d, i) { return "translate(0," + yScale(d.State) + ")"; })
+      };
+
+
+        // and then by State name 
+        var reorderState = function () {
+        var sort;
+
+          if (CheckStateAsc === true) {
+            sort = StateSortD;
+            CheckStateAsc = false;
+          }
+          else { 
+            sort = StateSortA;
+            CheckStateAsc = true;
+          }
+        
+        var sorteddata2 = data.sort(sort)
+
+        yScale.domain(sorteddata2.map(state))
+
+        groups.transition()
+        .duration(750)
+        .delay(function (d, i) { return i * 10; })
+        .attr("transform", function (d, i) { return "translate(0," + yScale(d.State) + ")"; })
+      };
+
+      // finally, execute the sorts based on a click on the relevant header
+      d3.selectAll("input").on("click", function() { 
+        var value = this.value;
+        if (value === "states") { 
+          reorderState(); 
+        } 
+        else { 
+          reorderRate(); 
+        } 
+      });
 
     });
   </script>
 </body>
 </html>
+
+
+

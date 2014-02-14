@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
   <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -6,16 +6,25 @@
 
     <style type="text/css">
 
+<<<<<<< HEAD
     /*set CSS styles to make it look like the BOL table, for rows and each cell therein*/
+=======
+    /*set CSS for the table rows and cells therein*/
+>>>>>>> 1f9c55cf706ea4d0114f61cde8e94ebf06737f3c
     tr, td, th {
       padding: 2px;
       border: 1px black solid;
       font-family: Tahoma, sans-serif;
       font-size: small;
       text-align: center;
+      border-collapse: collapse;
     }
 
+<<<<<<< HEAD
     /*set CSS for the entire table*/
+=======
+    /*CSS for the entire table*/
+>>>>>>> 1f9c55cf706ea4d0114f61cde8e94ebf06737f3c
     table {
       padding: 2px;
       border: 1px black solid;
@@ -25,7 +34,11 @@
       border-collapse: collapse;
     }
 
+<<<<<<< HEAD
     /* and for the caption at the top of the table proper*/
+=======
+    /*and for the caption at the top of the table*/
+>>>>>>> 1f9c55cf706ea4d0114f61cde8e94ebf06737f3c
     caption {
       padding: 2px;
       border-top: 1px black solid;
@@ -44,139 +57,253 @@
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script>
 
+<<<<<<< HEAD
     /* access the body of the HTML page*/
     var body = d3.select("body");
 
     /* create a h1 div + set CSS styles for the title*/
+=======
+    /*access the body of the HTML page*/
+    var body = d3.select("body");
+
+    /*create + style a h1 div for the page title*/
+>>>>>>> 1f9c55cf706ea4d0114f61cde8e94ebf06737f3c
     var h1 = body.append("h1");
     h1.text("Unemployment Rates for States")
-    .style("font-size", "12")
+    .style("font-size", "10")
     .style("text-align", "center")
 
+<<<<<<< HEAD
 
+=======
+    /*bring in data from the TSV table*/
+>>>>>>> 1f9c55cf706ea4d0114f61cde8e94ebf06737f3c
     d3.text("unemp_states_us_nov_2013.tsv", function(_data){
 
+      /*parse the TSV row by row*/
       var data = d3.tsv.parseRows(_data);
 
+      /*separate the header (the first row) from the rest of the state data (subsequent rows)*/
       var headers = data.slice(0,1);
       var states = data.slice(1);
 
+      /*create the table, head, body and caption*/
       var table = d3.select("body").append("table")
       var thead = table.append("thead")
       var tbody = table.append("tbody")
       var caption = table.append("caption")
       caption.html("Monthly Rankings" + "</br>" + "Seasonally Adjusted" + "</br>" + "Nov. 2013" + "</br>");
 
+      /*set the color gradient*/
       var color = d3.scale.linear()
-      .domain([0, tbody.selectAll("tr")[0].length-1])
+      .domain(d3.extent(data, function (d) { return +d[2]; }))
       .interpolate(d3.interpolateRgb)
-      .range(["orangered", "silver"])
+      .range(["lightblue", "orangered"]);
 
+      /*instantiate the various sort functions, by each header (state, rate or graph) and ascending/descending*/
+      var StateSortA = function(a, b) { 
+        return d3.ascending(a[1], b[1]) 
+      };
+
+      var StateSortD = function(a,b) {
+        return d3.descending(a[1], b[1]) 
+      };
+
+      var RateSortA = function(a,b) {
+        if (a[2] === b[2]) {
+          return d3.ascending(a[1], b[1])
+        }
+        else {
+          return +d3.ascending(a[2], b[2])
+        }
+      };
+
+      var RateSortD = function(a,b) {   
+        if (a[2] === b[2]) {
+          return d3.descending(a[1], b[1])
+        }
+        else {
+          return +d3.descending(a[2], b[2])
+        }
+      };
+
+      /*use the data from the rank column (0) to sort the bar graph since that's based on rank anyways*/
+      var GraphSortA = function(a,b) {
+        if (a[0] === b[0]) {
+          return d3.ascending(a[1], b[1])
+        }
+        else {
+          return d3.ascending(parseFloat(a[0]), parseFloat(b[0]))
+        }
+      };
+
+      var GraphSortD = function(a,b) {
+        if (a[0] === b[0]) {
+          return d3.descending(a[1], b[1])
+        }
+        else {
+          return d3.descending(parseFloat(a[0]), parseFloat(b[0]))
+        }
+      };
+
+      /*create toggles to check whether to sort ascending or descending*/
+      var CheckStateAsc = true;
+      var CheckRateAsc = true;
+      var CheckBarAsc = true;
+
+      /*populate table header as the first row*/
       var heading = thead.selectAll("tr")
       .data(headers)
       .enter()
       .append("tr");
 
+      /*create function to do zebra striping of rows*/
       var zebra = function(d, i) {
        if (i%2===0){return "lightblue";}else{return "white";}
      };
 
-     var headerrow = heading.selectAll("th")
-     .data(function(row) {
-      return d3.range(Object.keys(row).length).map(function(column, i) {
-        return row[Object.keys(row)[i]];
-      });
-    })
-     .enter()
-     .append("th")
-     .text(function(d) { return d; })
-     .on("mouseover", function (d, i) {d3.select(this).style("cursor", function() {
-      if (+d3.ascending(a[i], b[i]) === -1) {
-        return "s-resize";
-      }
-      else if (+d3.ascending(a[i], b[i]) === 1) {
-        return "n-resize";
-      }
-      else {
-        if(d3.ascending(a[1], b[1]) === -1) {
-          return "s-resize";            
-        }
-        else {
-          return "n-resize";            
-        }
-      }
-    } 
-          )})  // NOTE THAT I NEED TO FIX CURSOR AND ZEBRA ERROR THAT HAPPENS WHEN YOU HAVE TWO ODD RANKED STATES RIGHT NEXT TO EACH OTHER AFTER SORTING
-     .on("click", function (d, i) { 
-      var sort;
+     /* create function to execute coloring by data*/
+     var gradient = function (d) {
+        return color(d);
+      };
 
-      if (i > 0) { 
-        sort = function (a, b) {
-          if (a[i] === b[i]) {
-            return d3.ascending(a[1], b[1])
+      /*populate the header row of the table with data from the first row of the TSV*/
+      heading.selectAll("th")
+      .data(function(row) {
+        return d3.range(Object.keys(row).length).map(function(column, i) {
+          return row[Object.keys(row)[i]];
+        });
+      })
+      .enter()
+      .append("th")
+      .text(function(d) { return d; });
+
+      /*populate the last header cell with the heading for the bar graph*/
+      heading.insert("th")
+      .html("</br>" + "Graph")
+      .append("svg");
+
+      /* execute sort by various categories by header, as well as mouseover cursor changes*/
+      var headerrow = heading.selectAll("th")
+      // on click for the various header categories, execute sort
+      .on("click", function (d, i) { 
+        var sort;
+
+        // lexicographically by state
+        if (i===1) {
+          if (CheckStateAsc === true) {
+            sort = StateSortD;
+            CheckStateAsc = false;
           }
           else {
-            return +d3.ascending(a[i], b[i])
+            sort = StateSortA;
+            CheckStateAsc = true;
           }
         }
-      }
 
-      var rowsort = tbody.selectAll("tr").sort(sort)
-      .style("background-color", zebra)
-
-    })
-
-     .on("dblclick", function (d, i) {
-      var resort;
-
-      if (i > 0) { 
-        resort = function (a, b) {
-          if (a[i] === b[i]) {
-            return d3.descending(a[1], b[1])
+        // then by rate
+        if (i === 2) {
+          if (CheckRateAsc === true) {     
+            sort = RateSortD;
+            CheckRateAsc = false;
           }
           else {
-            return +d3.descending(a[i], b[i])
+            sort = RateSortA;
+            CheckRateAsc = true;
           }
         }
-      }
+        // finally, by rank through the bar graph
+        if (i === 3) {
+          if (CheckBarAsc === true) {     
+            sort = GraphSortD;
+            CheckBarAsc = false;
+          }
+          else {
+            sort = GraphSortA;
+            CheckBarAsc = true;
+          }
+        }
 
-      var rowresort = tbody.selectAll("tr").sort(resort)
-      .style("background-color", zebra) 
-      
-    });
-     
-     var rows = tbody.selectAll("tr")
-     .data(states)
-     .enter()
-     .append("tr")
-     .on("mouseover", function (){d3.select(this).style("background-color", "lightgreen");})
-     .on("mouseout", function (d, i){d3.select(this).style("background-color", function(){
-      if (i%2===0){return "lightblue";}else{return "white";}
-    })})
-     .sort(function (a, b) { 
-      if (a[2] === b[2]) {
-        return d3.ascending(a[1], b[1])
-      }
-      else {
-        return +d3.ascending(a[2], b[2])
-      }
-    })
-     .style("background-color", zebra)
+        // execute the sort and revert back to zebra striping after such
+        var rowsort = tbody.selectAll("tr").sort(sort) 
+        .style("background-color", zebra)
+      })
+      // on mousehover, change the cursor
+      .on("mouseover", function (d, i) {d3.select(this).style("cursor", function() {
+        // if you mouseover State and clicking will sort descending
+        if (i===1) {
+          if (CheckStateAsc === true) {
+            return "n-resize";
+          }
+          // or ascending
+          else {
+            return "s-resize";
+          }
+        }
+        // if you mouseover Rate and clicking will sort descending
+        if (i === 2) {
+          if (CheckRateAsc === true) {
+            return "n-resize";
+          }
+          // or again, ascending
+          else {
+            return "s-resize";
+          }
+        }
+        // or if you mouseover the Bar Graph sorted by Rank
+        if (i === 3) {
+          if (CheckBarAsc === true) {
+            return "n-resize";
+          }
+          else {
+            return "s-resize";
+          }
+        }
+      })});
 
-     var cells = rows.selectAll("td")
-     .data(function(row) {
-      return d3.range(Object.keys(row).length).map(function(column, i) {
-        return row[Object.keys(row)[i]];
-      });
-    })
-     .enter()
-     .append("td")
-     .attr("class", function (d, i) { return "column_" + i; })
-     .on("mouseover", function (d, i) {d3.selectAll("td.column_" + i).style("background-color", "lightgreen");})
-     .on("mouseout", function (d, i) {d3.selectAll("td.column_" + i).style("background-color", null)})
-     .text(function(d) { return d; });
+      /*create rows + execute row mouseover highlight and zebra striping functions*/
+      var rows = tbody.selectAll("tr")
+      .data(states)
+      .enter()
+      .append("tr")
+      .on("mouseover", function (){d3.select(this).style("background-color", "yellow");})
+      .on("mouseout", function (d, i){d3.select(this).style("background-color", function(){
+        if (i%2===0){return "lightblue";}else{return "white";}
+      })})
+      .sort(RateSortA)
+      .style("background-color", zebra);
+
+      /*populate rows with data from TSV*/
+      rows.selectAll("td")
+      .data(function(row) {
+        return d3.range(Object.keys(row).length).map(function(column, i) {
+          return row[Object.keys(row)[i]];
+        });})
+      .enter()
+      .append("td")
+      .text(function(d) { return d; });
+
+      /*add bar graph to fourth column of chart, use rank data to determine size of bar*/
+      rows.insert("td").append("svg")
+      .attr("width", 60)
+      .attr("height", 15)
+      // create the actual rectangles that constitute the bar graph
+      .append("rect")
+      .attr("height", 15)
+      .attr("width", function(d) { return parseFloat(d[0]); });
+
+      /*create cells array and execute column mouseover highlighting and coloring by rank for the 3rd column*/
+      var cells = rows.selectAll("td")
+      .attr("class", function (d, i) { return "column_" + i; })
+      // set the gradient background color for the Rate column
+      .style("background-color", function (d, i) { if (i === 2) { return color(d); } })
+      // add yellow highlighting specifications if you mouseover the relevant cell
+      .on("mouseover", function (d, i) {d3.selectAll("td.column_" + i).style("background-color", "yellow");})
+      .on("mouseout", function (d, i) { if (i === 2) { d3.selectAll("td.column_2").style("background-color", gradient); } else { d3.selectAll("td.column_" + i).style("background-color", null )}});
 
    });
   </script>
 </body>
 </html>
+
+
