@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
   <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -6,11 +6,7 @@
 
     <style type="text/css">
 
-<<<<<<< HEAD
-    /*set CSS styles to make it look like the BOL table, for rows and each cell therein*/
-=======
     /*set CSS for the table rows and cells therein*/
->>>>>>> 1f9c55cf706ea4d0114f61cde8e94ebf06737f3c
     tr, td, th {
       padding: 2px;
       border: 1px black solid;
@@ -20,11 +16,7 @@
       border-collapse: collapse;
     }
 
-<<<<<<< HEAD
-    /*set CSS for the entire table*/
-=======
     /*CSS for the entire table*/
->>>>>>> 1f9c55cf706ea4d0114f61cde8e94ebf06737f3c
     table {
       padding: 2px;
       border: 1px black solid;
@@ -34,11 +26,7 @@
       border-collapse: collapse;
     }
 
-<<<<<<< HEAD
-    /* and for the caption at the top of the table proper*/
-=======
     /*and for the caption at the top of the table*/
->>>>>>> 1f9c55cf706ea4d0114f61cde8e94ebf06737f3c
     caption {
       padding: 2px;
       border-top: 1px black solid;
@@ -53,31 +41,19 @@
     </style>
   </head>
   <body>
-
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script>
 
-<<<<<<< HEAD
-    /* access the body of the HTML page*/
-    var body = d3.select("body");
-
-    /* create a h1 div + set CSS styles for the title*/
-=======
     /*access the body of the HTML page*/
     var body = d3.select("body");
 
     /*create + style a h1 div for the page title*/
->>>>>>> 1f9c55cf706ea4d0114f61cde8e94ebf06737f3c
     var h1 = body.append("h1");
     h1.text("Unemployment Rates for States")
     .style("font-size", "10")
     .style("text-align", "center")
 
-<<<<<<< HEAD
-
-=======
     /*bring in data from the TSV table*/
->>>>>>> 1f9c55cf706ea4d0114f61cde8e94ebf06737f3c
     d3.text("unemp_states_us_nov_2013.tsv", function(_data){
 
       /*parse the TSV row by row*/
@@ -305,5 +281,4 @@
   </script>
 </body>
 </html>
-
 
