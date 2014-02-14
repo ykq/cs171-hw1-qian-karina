@@ -161,9 +161,11 @@
 
       /* execute sort by various categories by header, as well as mouseover cursor changes*/
       var headerrow = heading.selectAll("th")
+      // on click for the various header categories, execute sort
       .on("click", function (d, i) { 
         var sort;
 
+        // lexicographically by state
         if (i===1) {
           if (CheckStateAsc === true) {
             sort = StateSortD;
@@ -174,6 +176,8 @@
             CheckStateAsc = true;
           }
         }
+
+        // then by rate
         if (i === 2) {
           if (CheckRateAsc === true) {     
             sort = RateSortD;
@@ -184,6 +188,7 @@
             CheckRateAsc = true;
           }
         }
+        // finally, by rank through the bar graph
         if (i === 3) {
           if (CheckBarAsc === true) {     
             sort = GraphSortD;
@@ -195,27 +200,33 @@
           }
         }
 
-
+        // execute the sort and revert back to zebra striping after such
         var rowsort = tbody.selectAll("tr").sort(sort) 
         .style("background-color", zebra)
       })
+      // on mousehover, change the cursor
       .on("mouseover", function (d, i) {d3.select(this).style("cursor", function() {
+        // if you mouseover State and clicking will sort descending
         if (i===1) {
           if (CheckStateAsc === true) {
             return "n-resize";
           }
+          // or ascending
           else {
             return "s-resize";
           }
         }
+        // if you mouseover Rate and clicking will sort descending
         if (i === 2) {
           if (CheckRateAsc === true) {
             return "n-resize";
           }
+          // or again, ascending
           else {
             return "s-resize";
           }
         }
+        // or if you mouseover the Bar Graph sorted by Rank
         if (i === 3) {
           if (CheckBarAsc === true) {
             return "n-resize";
@@ -252,6 +263,7 @@
       rows.insert("td").append("svg")
       .attr("width", 60)
       .attr("height", 15)
+      // create the actual rectangles that constitute the bar graph
       .append("rect")
       .attr("height", 15)
       .attr("width", function(d) { return parseFloat(d[0]); });
@@ -259,7 +271,9 @@
       /*create cells array and execute column mouseover highlighting and coloring by rank for the 3rd column*/
       var cells = rows.selectAll("td")
       .attr("class", function (d, i) { return "column_" + i; })
+      // set the gradient background color for the Rate column
       .style("background-color", function (d, i) { if (i === 2) { return color(d); } })
+      // add yellow highlighting specifications if you mouseover the relevant cell
       .on("mouseover", function (d, i) {d3.selectAll("td.column_" + i).style("background-color", "yellow");})
       .on("mouseout", function (d, i) { if (i === 2) { d3.selectAll("td.column_2").style("background-color", gradient); } else { d3.selectAll("td.column_" + i).style("background-color", null )}});
 
